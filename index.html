@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0a0a0f" />
+<title>DEDCARD // Trading Card Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=VT323&family=Space+Grotesk:wght@400;500;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="scanlines" aria-hidden="true"></div>
+<div class="noise" aria-hidden="true"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo-mark" aria-hidden="true">&#9632;&#9632;&#9633;&#9632;</span>
+    <span class="logo-text">DED<em>/</em>CARD</span>
+    <span class="logo-sub">v0.42 // trading card generator</span>
+  </div>
+  <div class="ascii-strip" aria-hidden="true">
+    &gt;&gt; ACCESS_GRANTED // PRINTING_DECK // ctOS_BYPASSED &lt;&lt;
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- ================= FORM ================= -->
+  <section class="panel form-panel" aria-label="Card builder">
+    <h2 class="panel-title"><span class="bracket">[</span> build_card <span class="bracket">]</span></h2>
+
+    <form id="card-form" autocomplete="off">
+      <div class="row">
+        <label for="f-name">name / handle</label>
+        <input id="f-name" type="text" maxlength="22" value="WRENCH_JR" />
+      </div>
+
+      <div class="row two">
+        <div>
+          <label for="f-title">title</label>
+          <input id="f-title" type="text" maxlength="28" value="the signal breaker" />
+        </div>
+        <div>
+          <label for="f-rank">rank</label>
+          <select id="f-rank">
+            <option>S+</option><option selected>S</option><option>A</option>
+            <option>B</option><option>C</option><option>??</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row two">
+        <div>
+          <label for="f-id">card id</label>
+          <input id="f-id" type="text" maxlength="12" value="0x4D-A1" />
+        </div>
+        <div>
+          <label for="f-number">no.</label>
+          <input id="f-number" type="text" maxlength="5" value="042" />
+        </div>
+      </div>
+
+      <div class="row">
+        <label for="f-flavor">flavor quote</label>
+        <textarea id="f-flavor" rows="2" maxlength="120">// they think they built the city. we just changed the password.</textarea>
+      </div>
+
+      <div class="row">
+        <label for="f-image">portrait (optional)</label>
+        <input id="f-image" type="file" accept="image/*" />
+        <p class="hint">no upload? we generate a glitch-initial sigil.</p>
+      </div>
+
+      <div class="row">
+        <label>palette</label>
+        <div class="palette-picker" id="palette-picker" role="radiogroup" aria-label="Palette">
+          <button type="button" class="swatch is-active" data-palette="acid"    style="--a:#ff2a6d;--b:#05d9e8;--c:#d1f7ff" aria-label="Acid"></button>
+          <button type="button" class="swatch"           data-palette="toxic"   style="--a:#39ff14;--b:#ff006e;--c:#fffd82" aria-label="Toxic"></button>
+          <button type="button" class="swatch"           data-palette="sunset"  style="--a:#ff9a00;--b:#8338ec;--c:#ffd166" aria-label="Sunset"></button>
+          <button type="button" class="swatch"           data-palette="cobalt"  style="--a:#1a6dff;--b:#c822ff;--c:#b8f2ff" aria-label="Cobalt"></button>
+          <button type="button" class="swatch"           data-palette="blood"   style="--a:#ff2e2e;--b:#111111;--c:#ffbf69" aria-label="Blood"></button>
+          <button type="button" class="swatch"           data-palette="moebius" style="--a:#ffb3a7;--b:#6ec5c1;--c:#f4e2b8" aria-label="Moebius"></button>
+        </div>
+      </div>
+
+      <fieldset class="traits">
+        <legend>traits <span class="hint">(values 0–100, drag sliders)</span></legend>
+        <div class="trait-list" id="trait-list">
+          <!-- populated by JS -->
+        </div>
+        <div class="trait-actions">
+          <button type="button" id="add-trait">+ add trait</button>
+          <span class="hint"><span id="trait-count">0</span> / 5</span>
+        </div>
+      </fieldset>
+
+      <div class="row switch-row">
+        <label class="switch">
+          <input id="f-shiny" type="checkbox" />
+          <span>force shiny ✦</span>
+        </label>
+        <button type="button" id="reroll" class="ghost-btn">randomize</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- ================= CARD ================= -->
+  <section class="panel card-panel" aria-label="Live card preview">
+    <div class="tilt-stage">
+      <article id="card" class="card" data-palette="acid">
+
+        <!-- shine layers -->
+        <div class="shine shine-base" aria-hidden="true"></div>
+        <div class="shine shine-iridescent" aria-hidden="true"></div>
+        <div class="shine shine-sparkle" aria-hidden="true"></div>
+
+        <!-- halftone + grain -->
+        <div class="halftone" aria-hidden="true"></div>
+        <div class="grain" aria-hidden="true"></div>
+        <div class="glitch-bars" aria-hidden="true"></div>
+
+        <!-- frame/border -->
+        <div class="frame" aria-hidden="true">
+          <span class="corner tl"></span><span class="corner tr"></span>
+          <span class="corner bl"></span><span class="corner br"></span>
+        </div>
+
+        <!-- top bar -->
+        <header class="card-top">
+          <div class="card-id">
+            <span class="dot"></span>
+            <span id="c-id">0x4D-A1</span>
+          </div>
+          <div class="card-rank" id="c-rank">S</div>
+          <div class="card-no">
+            <span class="ascii">#</span><span id="c-number">042</span>
+          </div>
+        </header>
+
+        <!-- portrait -->
+        <div class="portrait">
+          <div class="portrait-frame">
+            <div class="portrait-img" id="c-portrait">
+              <span class="initial" id="c-initial">W</span>
+            </div>
+            <div class="portrait-scan" aria-hidden="true"></div>
+            <div class="portrait-glitch" aria-hidden="true"></div>
+            <div class="portrait-grid" aria-hidden="true"></div>
+          </div>
+          <div class="portrait-tag">
+            <span>TARGET_ACQUIRED</span>
+            <span class="blink">●REC</span>
+          </div>
+        </div>
+
+        <!-- name -->
+        <div class="name-block">
+          <h1 class="card-name" id="c-name" data-text="WRENCH_JR">WRENCH_JR</h1>
+          <p class="card-title" id="c-title">the signal breaker</p>
+        </div>
+
+        <!-- traits -->
+        <ul class="card-traits" id="c-traits"></ul>
+
+        <!-- flavor -->
+        <p class="card-flavor" id="c-flavor">// they think they built the city. we just changed the password.</p>
+
+        <!-- footer -->
+        <footer class="card-foot">
+          <span class="foot-left">DEDCARD_PROTOCOL</span>
+          <span class="foot-mid" aria-hidden="true">▞▞▞ ░░░ ▞▞▞</span>
+          <span class="foot-right">&#9733; <span id="c-shiny-tag">PRINT</span></span>
+        </footer>
+      </article>
+    </div>
+
+    <div class="card-actions">
+      <button id="btn-download" class="primary-btn">download PNG</button>
+      <button id="btn-motion" class="ghost-btn">enable motion</button>
+      <p class="motion-hint">tilt your phone or hover with a mouse. tap card to force shiny.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="pagefoot">
+  <span>[ DEDCARD ] </span>
+  <span class="ascii" aria-hidden="true">█░█░█░█░█░█░█░█</span>
+  <span>sign the deck &amp; hand it to a friend</span>
+</footer>
+
+<!-- trait row template -->
+<template id="trait-template">
+  <div class="trait-row">
+    <input class="t-name" type="text" maxlength="16" />
+    <input class="t-val" type="range" min="0" max="100" step="1" />
+    <output class="t-out"></output>
+    <button type="button" class="t-del" aria-label="remove trait">×</button>
+  </div>
+</template>
+
+<script src="script.js"></script>
+</body>
+</html>
